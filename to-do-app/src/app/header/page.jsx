@@ -14,6 +14,9 @@ const Header = () => {
 						/>
 					</Link>
 				</div>
+				<Link href="/" className="text-white text-lg mr-4">
+					Tareas
+				</Link>
 				<Link href="/about" className="text-white text-lg">
 					Acerca
 				</Link>
