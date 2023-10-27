@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useRef, useCallback } from "react";
 import { Trash2, Edit2 } from "feather-icons-react";
 import {

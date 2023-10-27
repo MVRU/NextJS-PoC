@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Trash2, Edit2 } from "feather-icons-react";
 import Head from "next/head";
 import Header from "./header/page";
