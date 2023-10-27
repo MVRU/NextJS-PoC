@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
+import { Trash2, Edit2 } from "feather-icons-react";
 import Head from "next/head";
 import Header from "./header/page";
 import Modal from "./modal/page";
