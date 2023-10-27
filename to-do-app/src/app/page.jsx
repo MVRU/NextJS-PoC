@@ -1,15 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import Header from "./header/page";
-import { Trash2, Edit2 } from "feather-icons-react";
+import Modal from "./modal/page";
+import TaskList from "./tasklist/page";
+import {
+	updateLocalStorageTasks,
+	handleKeyDown,
+	handleEmptyTasks,
+	handleConfirmEmptyTasks,
+} from "./utils";
 
 export default function Home() {
 	const [tasks, setTasks] = useState([]);
 	const [newTask, setNewTask] = useState("");
-	const [showCompleted, setShowCompleted] = useState(false);
 
 	useEffect(() => {
 		try {
@@ -18,19 +23,11 @@ export default function Home() {
 				setTasks(JSON.parse(storedTasks));
 			}
 		} catch (error) {
-			console.error("Error fetching tasks from localStorage: ", error);
+			console.error("Error al recuperar tareas de localStorage: ", error);
 		}
 	}, []);
 
-	const updateLocalStorageTasks = (updatedTasks) => {
-		try {
-			localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-		} catch (error) {
-			console.error("Error saving tasks to localStorage: ", error);
-		}
-	};
-
-	const handleAddTask = () => {
+	const handleAddTask = useCallback(() => {
 		if (newTask.trim() !== "") {
 			const updatedTasks = [
 				...tasks,
@@ -40,20 +37,34 @@ export default function Home() {
 			updateLocalStorageTasks(updatedTasks);
 			setNewTask("");
 		}
-	};
+	}, [newTask, tasks]);
 
-	const handleDeleteTask = (index) => {
-		const updatedTasks = tasks.filter((_, i) => i !== index);
-		setTasks(updatedTasks);
-		updateLocalStorageTasks(updatedTasks);
-	};
+	const handleDeleteTask = useCallback(
+		(index) => {
+			const updatedTasks = tasks.filter(
+				(_, i) => i !== index && !tasks[i].completed
+			);
+			setTasks(updatedTasks);
+			updateLocalStorageTasks(updatedTasks);
+		},
+		[tasks]
+	);
 
-	const handleToggleComplete = (index) => {
-		const updatedTasks = [...tasks];
-		updatedTasks[index].completed = !updatedTasks[index].completed;
-		setTasks(updatedTasks);
-		updateLocalStorageTasks(updatedTasks);
-	};
+	const handleToggleComplete = useCallback(
+		(index) => {
+			const updatedTasks = [...tasks];
+			updatedTasks[index].completed = true;
+
+			setTimeout(() => {
+				const tasksAfterDelay = updatedTasks.filter(
+					(_, i) => i !== index
+				);
+				setTasks(tasksAfterDelay);
+				updateLocalStorageTasks(tasksAfterDelay);
+			}, 1000);
+		},
+		[tasks]
+	);
 
 	const handleRenameTask = (index, newName) => {
 		if (newName !== null) {
@@ -71,54 +82,20 @@ export default function Home() {
 	};
 
 	useEffect(() => {
-		window.addEventListener("keydown", handleKeyDown);
+		window.addEventListener("keydown", (e) =>
+			handleKeyDown(e, setShowModal, handleEmptyTasks)
+		);
 		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
+			window.removeEventListener("keydown", (e) =>
+				handleKeyDown(e, setShowModal, handleEmptyTasks)
+			);
 		};
 	}, []);
 
 	const [showModal, setShowModal] = useState(false);
 
-	const handleKeyDown = (e) => {
-		if (e.ctrlKey && e.key === "Delete") {
-			setShowModal(true);
-		}
-		if (showModal) {
-			const modalButtons = document.querySelectorAll(
-				".modal-content button"
-			);
-			if (e.key === "ArrowLeft") {
-				modalButtons[0].focus();
-			}
-			if (e.key === "ArrowRight") {
-				modalButtons[1].focus();
-			}
-			if (e.key === "Enter") {
-				if (document.activeElement === modalButtons[0]) {
-					handleEmptyTasks();
-				}
-				if (document.activeElement === modalButtons[1]) {
-					setShowModal(false);
-				}
-			}
-		}
-	};
-
-	useEffect(() => {
-		window.addEventListener("keydown", handleKeyDown);
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
-		};
-	}, [showModal]);
-
 	const handleEmptyTasks = () => {
 		setShowModal(true);
-	};
-
-	const handleConfirmEmptyTasks = () => {
-		setTasks([]);
-		updateLocalStorageTasks([]);
-		setShowModal(false);
 	};
 
 	const handleCancelEmptyTasks = () => {
@@ -137,8 +114,6 @@ export default function Home() {
 		}
 		setTasks(updatedTasks);
 	};
-
-	const completedTasks = tasks.filter((task) => task.completed);
 
 	return (
 		<div>
@@ -171,139 +146,26 @@ export default function Home() {
 					>
 						Vaciar
 					</button>
-					{/* Modal */}
-					{showModal && (
-						<div className="modal ml-6 bg-gray-800 px-4 rounded-lg">
-							<div className="modal-content">
-								<p className="font-bold">
-									¿Desea borrar todas las tareas?
-								</p>
-								<button
-									onClick={handleConfirmEmptyTasks}
-									className=" text-white mr-2 hover:text-red-500 focus:text-red-500 transition duration-300 ease-in-out"
-								>
-									Borrar
-								</button>
-								<button
-									onClick={handleCancelEmptyTasks}
-									className=" text-white hover:text-gray-400 focus:text-gray-400 transition duration-300 ease-in-out"
-								>
-									Cancelar
-								</button>
-							</div>
-						</div>
-					)}
-				</div>
-
-				<ul>
-					{tasks.map(
-						(task, index) =>
-							!task.completed && (
-								<li
-									key={index}
-									className="bg-gray-800 p-2 mb-2 flex justify-between items-center rounded-lg"
-								>
-									<div>
-										<input
-											type="checkbox"
-											checked={task.completed}
-											onChange={() =>
-												handleToggleComplete(index)
-											}
-											className="mr-2"
-										/>
-										<span
-											className={
-												task.completed
-													? "line-through"
-													: ""
-											}
-										>
-											{task.name}
-										</span>
-									</div>
-									<div>
-										<button
-											onClick={() =>
-												handleRenameTask(
-													index,
-													prompt(
-														"Ingrese el nuevo nombre de la tarea",
-														task.name
-													)
-												)
-											}
-											className="text-blue-500 mr-2"
-										>
-											<Edit2 size={18} />
-										</button>
-										<button
-											onClick={() =>
-												moveTask(index, "up")
-											}
-											className="text-white mr-2"
-										>
-											↑
-										</button>
-										<button
-											onClick={() =>
-												moveTask(index, "down")
-											}
-											className="text-white"
-										>
-											↓
-										</button>
-										<button
-											onClick={() =>
-												handleDeleteTask(index)
-											}
-											className="text-red-500 ml-2"
-											disabled={task.completed}
-										>
-											<Trash2 size={18} />
-										</button>
-									</div>
-								</li>
+					<Modal
+						showModal={showModal}
+						handleConfirmEmptyTasks={() =>
+							handleConfirmEmptyTasks(
+								setTasks,
+								updateLocalStorageTasks,
+								setShowModal
 							)
-					)}
-				</ul>
-
-				<div className="mt-4">
-					<button
-						onClick={() => setShowCompleted(!showCompleted)}
-						className="bg-gray-800 text-white p-2 rounded-lg"
-					>
-						{showCompleted
-							? "🔼 Ocultar Tareas Completadas"
-							: "🔽 Mostrar Tareas Completadas"}
-					</button>
-					{showCompleted && (
-						<ul className="mt-4">
-							{completedTasks.map((task, index) => (
-								<li
-									key={index}
-									className="bg-gray-500 p-2 mb-2 flex justify-between items-center rounded-lg"
-								>
-									<div>
-										<span className="line-through">
-											{task.name}
-										</span>
-									</div>
-									<div>
-										<button
-											onClick={() =>
-												handleDeleteTask(index)
-											}
-											className="text-red-700"
-										>
-											<Trash2 size={18} />
-										</button>
-									</div>
-								</li>
-							))}
-						</ul>
-					)}
+						}
+						handleCancelEmptyTasks={handleCancelEmptyTasks}
+					/>
 				</div>
+
+				<TaskList
+					tasks={tasks}
+					handleToggleComplete={handleToggleComplete}
+					handleRenameTask={handleRenameTask}
+					moveTask={moveTask}
+					handleDeleteTask={handleDeleteTask}
+				/>
 			</main>
 		</div>
 	);

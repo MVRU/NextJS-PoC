@@ -5,3 +5,16 @@
 body {
 	@apply bg-gray-950 text-white;
 }
+
+@keyframes fadeOut {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+.animate-fadeOut {
+	animation: fadeOut 0.5s;
+}
