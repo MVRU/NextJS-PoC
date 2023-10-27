@@ -8,13 +8,17 @@ const TaskList = ({
 	moveTask,
 	handleDeleteTask,
 }) => {
+	if (!tasks || tasks.length === 0) {
+		return <div>No hay tareas</div>;
+	}
+
 	return (
 		<ul>
 			{tasks.map((task, index) => (
 				<Task
 					key={index}
-					task={task}
 					index={index}
+					task={task}
 					handleToggleComplete={handleToggleComplete}
 					handleRenameTask={handleRenameTask}
 					moveTask={moveTask}
