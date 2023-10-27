@@ -43,7 +43,7 @@ export default function Home() {
 	const handleDeleteTask = useCallback(
 		(index) => {
 			const updatedTasks = tasks.filter(
-				(_, i) => i !== index && !tasks[i].completed
+				(_, i) => i !== index && !tasks[i].completed !== undefined
 			);
 			setTasks(updatedTasks);
 			updateLocalStorageTasks(updatedTasks);
@@ -51,21 +51,22 @@ export default function Home() {
 		[tasks]
 	);
 
-	const handleToggleComplete = useCallback(
+  const handleToggleComplete = useCallback(
 		(index) => {
 			const updatedTasks = [...tasks];
-			updatedTasks[index].completed = true;
-
-			setTimeout(() => {
-				const tasksAfterDelay = updatedTasks.filter(
-					(_, i) => i !== index
-				);
-				setTasks(tasksAfterDelay);
-				updateLocalStorageTasks(tasksAfterDelay);
-			}, 1000);
+			if (updatedTasks[index]?.completed !== undefined) {
+				updatedTasks[index].completed = true;
+				setTimeout(() => {
+					const tasksAfterDelay = updatedTasks.filter(
+						(_, i) => i !== index
+					);
+					setTasks(tasksAfterDelay);
+					updateLocalStorageTasks(tasksAfterDelay);
+				}, 1000);
+			}
 		},
 		[tasks]
-	);
+  );
 
 	const handleRenameTask = (index, newName) => {
 		if (newName !== null) {

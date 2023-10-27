@@ -23,7 +23,7 @@ const Task = ({
 		<li
 			id={`task-${index}`}
 			className={`p-2 mb-2 flex justify-between items-center rounded-lg transition-all duration-500 ${
-				task.completed
+				task && task.completed
 					? "bg-gray-950"
 					: highlight
 					? "bg-red-500"
@@ -34,7 +34,7 @@ const Task = ({
 				<input
 					type="checkbox"
 					ref={checkboxRef}
-					checked={task.completed}
+					checked={task && task.completed}
 					onClick={() =>
 						handleDeleteWithAnimation(
 							index,
@@ -48,8 +48,8 @@ const Task = ({
 					}
 					className="mr-2"
 				/>
-				<span className={task.completed ? "line-through" : ""}>
-					{task.name}
+				<span className={task && task.completed ? "line-through" : ""}>
+					{task && task.name}
 				</span>
 			</div>
 			<div>
@@ -60,7 +60,7 @@ const Task = ({
 							handleRenameTask,
 							prompt(
 								"Ingrese el nuevo nombre de la tarea",
-								task.name
+								task && task.name
 							)
 						)
 					}
@@ -89,7 +89,7 @@ const Task = ({
 						)
 					}
 					className="text-red-500 ml-2"
-					disabled={task.completed}
+					disabled={task && task.completed}
 				>
 					<Trash2 size={18} />
 				</button>
