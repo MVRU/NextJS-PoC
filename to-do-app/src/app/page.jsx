@@ -51,7 +51,7 @@ export default function Home() {
 		[tasks]
 	);
 
-  const handleToggleComplete = useCallback(
+	const handleToggleComplete = useCallback(
 		(index) => {
 			const updatedTasks = [...tasks];
 			if (updatedTasks[index]?.completed !== undefined) {
@@ -66,7 +66,7 @@ export default function Home() {
 			}
 		},
 		[tasks]
-  );
+	);
 
 	const handleRenameTask = (index, newName) => {
 		if (newName !== null) {
@@ -125,50 +125,52 @@ export default function Home() {
 			</Head>
 
 			<Header />
-			<main className="container mx-auto mt-5">
-				<h1 className="text-4xl font-bold mb-4">Lista de Tareas</h1>
+			<div className="mobile-container">
+				<main className="container mx-auto mt-5">
+					<h1 className="text-4xl font-bold mb-4">Lista de Tareas</h1>
 
-				<div className="mb-4 flex">
-					<input
-						type="text"
-						value={newTask}
-						onChange={(e) => setNewTask(e.target.value)}
-						onKeyPress={handleKeyPress}
-						className="mr-2 p-2 px-4 border text-black rounded-lg"
-					/>
-					<button
-						onClick={handleAddTask}
-						className="p-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
-					>
-						Agregar Tarea
-					</button>
-					<button
-						onClick={handleEmptyTasks}
-						className="bg-red-500 text-white p-2 ml-2 rounded-lg hover:bg-red-600 transition duration-300 ease-in-out"
-					>
-						Vaciar
-					</button>
-					<Modal
-						showModal={showModal}
-						handleConfirmEmptyTasks={() =>
-							handleConfirmEmptyTasks(
-								setTasks,
-								updateLocalStorageTasks,
-								setShowModal
-							)
-						}
-						handleCancelEmptyTasks={handleCancelEmptyTasks}
-					/>
-				</div>
+					<div className="mb-4 flex ">
+						<input
+							type="text"
+							value={newTask}
+							onChange={(e) => setNewTask(e.target.value)}
+							onKeyPress={handleKeyPress}
+							className="mr-2 p-0.5 md:p-2 md:px-4 border text-black rounded-lg"
+						/>
+						<button
+							onClick={handleAddTask}
+							className="md:p-2 md:px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out text-sm"
+						>
+							Agregar Tarea
+						</button>
+						<button
+							onClick={handleEmptyTasks}
+							className="bg-red-500 text-white md:p-2 ml-2 rounded-lg hover:bg-red-600 transition duration-300 ease-in-out text-sm"
+						>
+							Vaciar
+						</button>
+						<Modal
+							showModal={showModal}
+							handleConfirmEmptyTasks={() =>
+								handleConfirmEmptyTasks(
+									setTasks,
+									updateLocalStorageTasks,
+									setShowModal
+								)
+							}
+							handleCancelEmptyTasks={handleCancelEmptyTasks}
+						/>
+					</div>
 
-				<TaskList
-					tasks={tasks}
-					handleToggleComplete={handleToggleComplete}
-					handleRenameTask={handleRenameTask}
-					moveTask={moveTask}
-					handleDeleteTask={handleDeleteTask}
-				/>
-			</main>
+					<TaskList
+						tasks={tasks}
+						handleToggleComplete={handleToggleComplete}
+						handleRenameTask={handleRenameTask}
+						moveTask={moveTask}
+						handleDeleteTask={handleDeleteTask}
+					/>
+				</main>
+			</div>
 		</div>
 	);
 }

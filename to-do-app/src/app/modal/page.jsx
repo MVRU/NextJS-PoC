@@ -1,13 +1,13 @@
-import React from "react";
-
 const Modal = ({
 	showModal,
 	handleConfirmEmptyTasks,
 	handleCancelEmptyTasks,
 }) => {
-	return (
-		<>
-			{showModal && (
+	if (showModal) {
+		if (window.innerWidth <= 640) {
+			handleConfirmEmptyTasks();
+		} else {
+			return (
 				<div className="modal ml-6 bg-gray-800 px-4 rounded-lg">
 					<div className="modal-content">
 						<p className="font-bold">
@@ -27,9 +27,10 @@ const Modal = ({
 						</button>
 					</div>
 				</div>
-			)}
-		</>
-	);
+			);
+		}
+	}
+	return null;
 };
 
 export default Modal;

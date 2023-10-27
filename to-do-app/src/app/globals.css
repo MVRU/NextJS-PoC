@@ -18,3 +18,14 @@ body {
 .animate-fadeOut {
 	animation: fadeOut 0.5s;
 }
+
+.mobile-container {
+	margin: 0 10px; /* Puedes ajustar el valor de 10px según tus necesidades */
+}
+
+/* Agrega un media query para eliminar el margen en pantallas más grandes si es necesario */
+@media (min-width: 768px) {
+	.mobile-container {
+		margin: 0; /* Asegúrate de ajustar el valor según tus necesidades */
+	}
+}
